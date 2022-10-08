@@ -2,80 +2,81 @@ import random
 import numpy as np
 import numpy.random as rand
 
-# defining the start row and col
-transitions = [(0, 1), (0, -1), (-1, 0), (1, 0)]
+class Maze:
 
-blocked_sets = []
+    # env_row_dimension = 3
+    # env_col_dimension = 3
+    # n_runs = 2
+    transitions = [(0, 1), (0, -1), (-1, 0), (1, 0)]
+    blocked_sets = []
+    environments = []
 
-global env_row_dimension
-global env_col_dimension
-global visited_set
-global blocked_set
-global node_stack
-
-def is_valid(row_index, col_index):
-    global env_row_dimension
-    global env_col_dimension
-    return not (row_index < 0 or col_index < 0 or row_index >= env_row_dimension or col_index >= env_col_dimension or is_visited(row_index, col_index))
-
-def is_visited(row_index, col_index):
-    return [row_index, col_index] in visited_set
-
-def block(row_index, col_index):
-    global environment
-
-    blocked_set.append([row_index, col_index])
-    environment[row_index, col_index] = 1
-    return
-
-def block_define(row_index, col_index):
-    global node_stack
     global visited_set
+    global blocked_set
+    global node_stack
 
-    if rand.randint(0, 9) >= 7:
-        block(row_index, col_index)
-    visited_set.append([row_index, col_index])
-    node_stack.append([row_index, col_index])
-    return
+    def is_valid(self,row_index, col_index , visited_set):
+        return not (row_index < 0 or col_index < 0 or row_index >= self.env_row_dimension or col_index >= self.env_col_dimension or self.is_visited(row_index, col_index , visited_set))
 
-def DFS_maze_search(row_index, col_index):
-    global env_row_dimension
-    global env_col_dimension
-    global environment
+    def is_visited(self , row_index, col_index, visited_set):
+        return [row_index, col_index] in visited_set
 
-    node_stack = [[row_index, col_index]]
+    def block( self , row_index, col_index , environment , blocked_set):
+        blocked_set.append([row_index, col_index])
+        environment[row_index, col_index] = 1
+        return
 
-    while len(node_stack) > 0:
-        curr_row_index, curr_col_index = node_stack[len(node_stack) - 1]
-        node_stack.remove(node_stack[len(node_stack) - 1])
+    def block_define(self,row_index, col_index , visited_set , node_stack , blocked_set , environment):
+        if rand.randint(0, 9) >= 7:
+            self.block(row_index, col_index , environment , blocked_set )
+        visited_set.append([row_index, col_index])
+        node_stack.append([row_index, col_index])
+        return
 
-        if is_valid(curr_row_index, curr_col_index):
-            block_define(curr_row_index, curr_col_index)
-            rand_list = []
-            while len(rand_list)!=4:
-                rand_n = rand.randint(0, 4)
-                if rand_n not in rand_list:
-                    rand_list.append(rand_n)
-                    neig_row, neig_col = np.array([curr_row_index, curr_col_index]) + np.array(transitions[rand_n])
-                    if is_valid(neig_row, neig_col):
-                        node_stack.append([neig_row, neig_col])
+    def DFS_maze_search(self ,row_index, col_index , visited_set , blocked_set , environment):
 
-def generation_map(row_dimension , col_dimension , n_runs = 1):
-    env_row_dimension = row_dimension
-    env_col_dimension = col_dimension
-    n_runs = n_runs
+        node_stack = [[row_index, col_index]]
 
-    for i in range(0,n_runs):
-        visited_set = []
-        blocked_set = []
-        node_stack = []
-        environment = np.zeros((env_row_dimension, env_col_dimension), dtype=int)
+        while len(node_stack) > 0:
+            curr_row_index, curr_col_index = node_stack[len(node_stack) - 1]
+            node_stack.remove(node_stack[len(node_stack) - 1])
 
-        start_row_index, start_col_index = random.randint(0, env_row_dimension - 1), random.randint(0, env_col_dimension - 1)
-        DFS_maze_search(start_row_index, start_col_index)
+            if self.is_valid(curr_row_index, curr_col_index , visited_set):
+                self.block_define(curr_row_index, curr_col_index , visited_set , node_stack , blocked_set , environment)
+                rand_list = []
+                while len(rand_list)!=4:
+                    rand_n = rand.randint(0, 4)
+                    if rand_n not in rand_list:
+                        rand_list.append(rand_n)
+                        neig_row, neig_col = np.array([curr_row_index, curr_col_index]) + np.array(self.transitions[rand_n])
+                        if self.is_valid(neig_row, neig_col , visited_set):
+                            node_stack.append([neig_row, neig_col])
 
-        blocked_sets.append(blocked_set)
+    def __init__(self,env_row_dimension , env_col_dimension, n_runs):
+        self.env_row_dimension = env_row_dimension
+        self.env_col_dimension = env_col_dimension
+        self.n_runs = n_runs
 
-    return blocked_sets
+        for i in range(0,n_runs):
+            visited_set = []
+            blocked_set = []
+            environment = np.zeros((env_row_dimension, env_col_dimension), dtype=int)
 
-generation_map(3,3,1)
+            start_row_index, start_col_index = random.randint(0, env_row_dimension - 1), random.randint(0, env_col_dimension - 1)
+            self.DFS_maze_search(start_row_index, start_col_index , visited_set , blocked_set , environment)
+
+            self.blocked_sets.append(blocked_set)
+            self.environments.append(environment)
+
+            print(len(visited_set))
+            for x in self.blocked_sets:
+                print(x)
+
+            for x in self.environments:
+                print(x)
+                print("")
+
+
+
+s1 = Maze(5,5,1)
+
