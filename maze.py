@@ -1,16 +1,14 @@
 import random
 import numpy as np
 import numpy.random as rand
-import pandas as pd
 
 # defining the start row and col
-env_row_dimension = 3
-env_col_dimension = 3
-n_runs = 2
 transitions = [(0, 1), (0, -1), (-1, 0), (1, 0)]
 
 blocked_sets = []
 
+global env_row_dimension
+global env_col_dimension
 global visited_set
 global blocked_set
 global node_stack
@@ -62,15 +60,22 @@ def DFS_maze_search(row_index, col_index):
                     if is_valid(neig_row, neig_col):
                         node_stack.append([neig_row, neig_col])
 
+def generation_map(row_dimension , col_dimension , n_runs = 1):
+    env_row_dimension = row_dimension
+    env_col_dimension = col_dimension
+    n_runs = n_runs
 
-for i in range(0,n_runs):
-    visited_set = []
-    blocked_set = []
-    node_stack = []
-    environment = np.zeros((env_row_dimension, env_col_dimension), dtype=int)
+    for i in range(0,n_runs):
+        visited_set = []
+        blocked_set = []
+        node_stack = []
+        environment = np.zeros((env_row_dimension, env_col_dimension), dtype=int)
 
-    start_row_index, start_col_index = random.randint(0, env_row_dimension - 1), random.randint(0, env_col_dimension - 1)
-    DFS_maze_search(start_row_index, start_col_index)
+        start_row_index, start_col_index = random.randint(0, env_row_dimension - 1), random.randint(0, env_col_dimension - 1)
+        DFS_maze_search(start_row_index, start_col_index)
 
-    blocked_sets.append(blocked_set)
+        blocked_sets.append(blocked_set)
 
+    return blocked_sets
+
+generation_map(3,3,1)
