@@ -1,5 +1,4 @@
 /**************erik****************/
-//#include "stdc++.h"
 #include "bits-stdc++.h"
 #include <cstdio>
 #include <iostream>
@@ -20,7 +19,16 @@ struct cell {
     int parent_i, parent_j;
     double f,g,h;
 };
-void astar() {
+bool isUnblocked() {
+
+}
+bool isDestination() {
+    
+}
+void calculateH(int x, int y, Pair dest) { //manhattan distance
+    return abs(x - dest.first) + abs(y - dest.second);
+}
+void astar() { // add parameters here
     bool closed[ROW][COL];
     memset(closed, false, sizeof(closed));
 
@@ -59,10 +67,37 @@ void astar() {
             x = x + dis[i][0];
             y = y + dis[i][0]; 
             if(x>=0 && x<ROW && y>=0 && y<COL) {
+                if (isDestination(x,y,dest)) {
+                    cellDetails[x][y].parent_i = i;
+                    cellDetails[x][y].parent_j = j;
+                    // trace the path -->
+                    traceIt(cellDetails, dest);
+                    foundDest = true;
+                    return;
+                } 
                 
+                else if(!closed[x][y] && isUnblocked(grid, x, y)) {
+                    gN = cellDetails[x][y].g + 1.0;
+                    hN = calculateH(x,y,dest);
+                    fN = gN + hN;
+
+                    if(cellDetails[x][y].f == inf || cellDetails[x][y].f > fN) {
+                        open.insert({fN, {x, y}});
+
+                        cellDetails[x][y].parent_i = x;
+                        cellDetails[x][y].parent_j = y;
+                        cellDetails[x][y].f = fN;
+                        cellDetails[x][y].g = gN;
+                        cellDetails[x][y].h = hN;
+                    }
+                }
             }
         }
     }
+    if(!foundDest) {
+        cout<<"No Destination present";
+    }
+    return;
 }
 int main()
 {
