@@ -1,54 +1,9 @@
-import math
 import heapq
+
+from maze import Maze
 
 
 class Solution:
-    def networkDelayTime(self, times, n: int, k: int) -> int:
-
-        #
-        times = [[2, 1, 1], [2, 3, 1], [3, 4, 1]]
-        n = 4
-        k = 2
-
-        adj = {}
-
-        time_taken = [math.inf] * (n + 1)
-        time_taken[k] = 0
-        time_taken[0] = 0
-
-        for time in times:
-            node = time[0]
-            if node not in adj:
-                adj[node] = []
-            adj[node].append((time[1], time[2]))
-
-        parent = [-1] * (n + 1)
-        heap = [(0, k, -1)]
-        visited = set()
-
-        # print(adj)
-        while heap:
-
-            node = heapq.heappop(heap)
-            if node[1] not in visited:
-                visited.add(node[1])
-                parent[node[1]] = node[2]
-                time_taken[node[1]] = node[0]
-
-                if node[1] in adj:
-                    for neighbour in adj[node[1]]:
-                        heapq.heappush(heap, (node[0] + neighbour[1], neighbour[0], node[1]))
-
-        max_time_taken = 0
-
-        for val in time_taken:
-            if val == math.inf:
-                return -1
-            else:
-                max_time_taken = max(max_time_taken, val)
-
-        return max_time_taken
-
     def get_path_for_maze(self, m, n, source, target, blocked_cells, h_cost_mat, use_adaptive_h_cost,
                           lower_g_cost=False):
 
@@ -165,29 +120,30 @@ class Solution:
         return True, path_till_blockage
 
 
-blocked_cells = set()
-blocked_cells.add((0, 2))
-blocked_cells.add((1, 1))
-# Solution().get_path_for_maze(3, 3, (0, 1), (2, 2), ())
-# Solution().get_path_for_maze(3, 3, (0, 1), (2, 2), blocked_cells)
-source = (0, 0)
-target = (2, 2)
-row = 3
-col = 3
+if __name__ == "__main__":
 
-h_cost_matrix = [[0] * col for i in range(row)]
-for i in range(row):
-    for j in range(col):
-        h_cost_matrix[i][j] = abs(target[0] - i) + abs(target[1] - j)
+    row = 100
+    col = 100
 
-print(Solution().solve_maze(row, col, source, target, blocked_cells, set(), h_cost_matrix, True, False))
+    source = (0, 0)
+    target = (row - 1, col - 1)
 
-# import numpy as np
-# import matplotlib.pyplot as plt
-#
-# plt.imshow(np.random.random((50,50)))
-# plt.colorbar()
-# plt.show()
+    h_cost_matrix = [[0] * col for i in range(row)]
+    for i in range(row):
+        for j in range(col):
+            h_cost_matrix[i][j] = abs(target[0] - i) + abs(target[1] - j)
 
+    blocked_cells_set = set()
 
-# sup bro
+    for cell in Maze(row, col, 1).blocked_sets[0]:
+        blocked_cells_set.add(tuple(cell))
+
+    if source in blocked_cells_set:
+        blocked_cells_set.remove(source)
+    if target in blocked_cells_set:
+        blocked_cells_set.remove(target)
+
+    print("blocked path", len(blocked_cells_set), blocked_cells_set)
+    # blocked_cells_set = {(4, 0), (0, 4), (3, 1), (0, 3), (1, 4), (2, 2)}
+
+    print(Solution().solve_maze(row, col, source, target, blocked_cells_set, set(), h_cost_matrix, True, True, True))
