@@ -47,11 +47,11 @@ def plotlines(path_followed):
     for i in range(len(path_followed)):
         path_followed[i] = rescale_to_grid(path_followed[i])
         if i != len(path_followed) - 1:
-            # pygame.draw.lines(gridDisplay, BLUE, False, path_followed[i], int(GRID_NODE_LENGTH/5))
-            pygame.draw.aalines(gridDisplay, BLUE, False, path_followed[i], 1)
+            pygame.draw.lines(gridDisplay, BLUE, False, path_followed[i], int(GRID_NODE_LENGTH/5))
+            # pygame.draw.aalines(gridDisplay, BLUE, False, path_followed[i], 1)
         else:
-            # pygame.draw.lines(gridDisplay, GREEN, False, path_followed[i], int(GRID_NODE_LENGTH/3))
-            pygame.draw.aalines(gridDisplay, GREEN, False, path_followed[i], 1)
+            pygame.draw.lines(gridDisplay, GREEN, False, path_followed[i], int(GRID_NODE_LENGTH/3))
+            # pygame.draw.aalines(gridDisplay, GREEN, False, path_followed[i], 1)
     pygame.display.update()
 
 
@@ -91,3 +91,18 @@ while run:
 # ps = pygameSetup()
 # ps.createDisplay()
 # ps.vis
+
+
+"""
+
+blocked_cells = {(0, 4), (3, 1), (1, 4), (4, 2), (1, 0)}
+source = (0,0)
+target = (4,4)
+solution = [[(0, 0), (0, 1), (0, 2), (0, 3), (0, 4), (1, 4), (2, 4), (3, 4), (4, 4)], [(0, 3), (1, 3), (1, 4), (2, 4), (3, 4), (4, 4)], [(1, 3), (2, 3), (2, 4), (3, 4), (4, 4)]]
+
+
+"""
+
+
+
+
