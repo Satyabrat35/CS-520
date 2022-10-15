@@ -14,7 +14,10 @@ class Solution:
         maze_start_time = time.time()
         path_history = [[(-1, -1)] * n for i in range(m)]
         cost_history = [[0] * n for i in range(m)]
-        initial_h_cost = h_cost_mat[source[0]][source[1]]
+        if use_adaptive_h_cost:
+            initial_h_cost = h_cost_mat[source[0]][source[1]]
+        else:
+            initial_h_cost = abs(target[0] - source[0]) + abs(target[1] - source[1])
         heap = [(initial_h_cost, 0, initial_h_cost, source, (-1, -1))]
         path_history[source[0]][source[1]] = (-2, -2)
         visited = set()
@@ -41,8 +44,10 @@ class Solution:
                     if 0 <= updated_row < m and 0 <= updated_col < n and (
                             updated_row, updated_col) not in blocked_cells and (
                             updated_row, updated_col) not in visited:
-                        new_h_cost = h_cost_mat[updated_row][updated_col]
-                        # new_h_cost = abs(target[0] - updated_row) + abs(target[1] - updated_col)
+                        if use_adaptive_h_cost:
+                            new_h_cost = h_cost_mat[updated_row][updated_col]
+                        else:
+                            new_h_cost = abs(target[0] - updated_row) + abs(target[1] - updated_col)
                         new_g_cost = g_cost + 1
 
                         g_cost_comparator = new_g_cost
@@ -57,7 +62,7 @@ class Solution:
             path_to_traverse.append(cell)
             cell = path_history[cell[0]][cell[1]]
             if cell == (-1, -1):
-                return []
+                return [], 0
 
         path_to_traverse.append(source)
 
@@ -67,7 +72,7 @@ class Solution:
         g_target = cost_history[target[0]][target[1]]
         maze_end_time = time.time()
 
-        print(f"time taken to solve maze for {len(visited)} is {maze_end_time - maze_start_time}")
+        # print(f"time taken to solve maze for {len(visited)} is {maze_end_time - maze_start_time}")
 
         adaptive_time_start = time.time()
         for i in range(row):
@@ -78,12 +83,12 @@ class Solution:
                     h_cost_matrix[i][j] = abs(target[0] - i) + abs(target[1] - j)
 
         adaptive_time_end = time.time()
-        print(f"time taken for adaptive update is {adaptive_time_end - adaptive_time_start}")
-        return path_to_traverse
+        # print(f"time taken for adaptive update is {adaptive_time_end - adaptive_time_start}")
+        return path_to_traverse, len(visited)
 
     def solve_maze(self, m, n, source, target, physical_map_blocked_cells, mental_map_blocked_cells, h_cost_mat,
                    use_adaptive_h_cost=False,
-                   forward=True, lower_g_cost=True, visited_paths=[]):
+                   forward=True, lower_g_cost=True, visited_paths=[], expanded_node_count=[]):
 
         transitions = [(0, 1), (0, -1), (-1, 0), (1, 0)]
         for transition in transitions:
@@ -94,13 +99,16 @@ class Solution:
                 mental_map_blocked_cells.add((updated_row, updated_col))
 
         if forward:
-            path = self.get_path_for_maze(m, n, source, target, mental_map_blocked_cells, h_cost_mat,
-                                          use_adaptive_h_cost, lower_g_cost)
+            path, visited_node_count = self.get_path_for_maze(m, n, source, target, mental_map_blocked_cells,
+                                                              h_cost_mat,
+                                                              use_adaptive_h_cost, lower_g_cost)
         else:
-            path = self.get_path_for_maze(m, n, target, source, mental_map_blocked_cells, h_cost_mat,
-                                          use_adaptive_h_cost, lower_g_cost)
+            path, visited_node_count = self.get_path_for_maze(m, n, target, source, mental_map_blocked_cells,
+                                                              h_cost_mat,
+                                                              use_adaptive_h_cost, lower_g_cost)
             path.reverse()
         visited_paths.append(path.copy())
+        expanded_node_count.append(visited_node_count)
         path_successfully_traversed_in_physical_map = True
         updated_source = source
         path_till_blockage = []
@@ -123,7 +131,7 @@ class Solution:
             is_solvable, path_from_new_source = self.solve_maze(m, n, updated_source, target,
                                                                 physical_map_blocked_cells, mental_map_blocked_cells,
                                                                 h_cost_mat, use_adaptive_h_cost, forward, lower_g_cost,
-                                                                visited_paths)
+                                                                visited_paths, expanded_node_count)
 
             if is_solvable:
                 path_till_blockage.pop()
@@ -153,8 +161,8 @@ if __name__ == "__main__":
     # print(Solution().solve_maze(row, col, source, target, blocked_cells_set, set(), h_cost_matrix, True, True, True, visited_path))
     # print(visited_path)
 
-    row = 101
-    col = 101
+    row = 5
+    col = 5
 
     source = (0, 0)
     target = (row - 1, col - 1)
@@ -175,15 +183,17 @@ if __name__ == "__main__":
         blocked_cells_set.remove(target)
 
     visited_path = []
-    # print("blocked path", len(blocked_cells_set), blocked_cells_set)
-    # blocked_cells_set = {(1, 2), (2, 2), (2, 3), (3, 2), (3, 3), (4,3)}
-    # source = (4, 2)
 
+    # print("blocked path", len(blocked_cells_set), blocked_cells_set)
+    blocked_cells_set = {(1, 2), (2, 2), (2, 3), (3, 2), (3, 3), (4, 3)}
+    source = (4, 2)
+    expanded_node_count_1 = []
     start = time.time()
-    Solution().solve_maze(row, col, source, target, blocked_cells_set, set(), h_cost_matrix, False, True, False,
-                          visited_path)
+    final_path = Solution().solve_maze(row, col, source, target, blocked_cells_set, set(), h_cost_matrix, False, False,
+                                       False,
+                                       visited_path, expanded_node_count_1)
     end = time.time()
-    print(" Forward Repeated A star time", end - start)
+    print(" forward g", end - start, sum(expanded_node_count_1), expanded_node_count_1, final_path)
     # print(visited_path)
     # for arr in visited_path:
     #     arr.reverse()
@@ -194,8 +204,11 @@ if __name__ == "__main__":
         for j in range(col):
             h_cost_matrix[i][j] = abs(target[0] - i) + abs(target[1] - j)
 
+    visited_path = []
+    expanded_node_count_2 = []
     start = time.time()
-    Solution().solve_maze(row, col, source, target, blocked_cells_set, set(), h_cost_matrix, True, True, False,
-                          visited_path)
+    final_path = Solution().solve_maze(row, col, source, target, blocked_cells_set, set(), h_cost_matrix, False, True,
+                                       False,
+                                       visited_path, expanded_node_count_2)
     end = time.time()
-    print(" Adaptive A star time", end - start)
+    print("backward g", end - start, sum(expanded_node_count_2), expanded_node_count_2, final_path)
