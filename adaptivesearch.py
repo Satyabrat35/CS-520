@@ -1,6 +1,6 @@
 import heapq
 import time
-
+import MinHeap as mh
 from maze import Maze
 
 
@@ -26,7 +26,7 @@ class Solution:
         # should exit when we find the target?
         while heap:
 
-            total_cost, g_cost, h_cost, cell, parent = heapq.heappop(heap)
+            total_cost, g_cost, h_cost, cell, parent = mh.pop(heap)
             # going to introduce negative g_cost to make heap behave differently in ties
             g_cost = abs(g_cost)
             if cell not in visited:
@@ -53,7 +53,7 @@ class Solution:
                         g_cost_comparator = new_g_cost
                         if not lower_g_cost:
                             g_cost_comparator = 0 - g_cost_comparator
-                        heapq.heappush(heap, (
+                        mh.push(heap, (
                             new_h_cost + new_g_cost, g_cost_comparator, new_h_cost, (updated_row, updated_col), cell))
 
         path_to_traverse = []
