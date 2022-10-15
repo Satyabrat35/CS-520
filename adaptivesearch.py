@@ -1,6 +1,6 @@
 import heapq
 import time
-import MinHeap as mh
+import minheap as mh
 from maze import Maze
 
 
