@@ -67,16 +67,7 @@ class Maze:
 
             self.blocked_sets.append(blocked_set)
             self.environments.append(environment)
-
-            # print(len(visited_set))
-            # for x in self.blocked_sets:
-            #     print(x)
-            #
-            # for x in self.environments:
-            #     print(x)
-            #     print("")
-
-
+        return
 
 # s1 = Maze(5,5,1)
 # print(s1.blocked_sets)
