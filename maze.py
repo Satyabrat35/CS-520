@@ -69,5 +69,5 @@ class Maze:
             self.environments.append(environment)
         return
 
-# s1 = Maze(5,5,1)
+# s1 = Maze(101,101,2)
 # print(s1.blocked_sets)

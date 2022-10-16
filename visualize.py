@@ -6,10 +6,10 @@ import numpy as np
 
 class Visualize:
     # Grid boundaries
-    GRID_LENGTH = 800
-    GRID_WIDTH = 800
-    GRID_ROWS = 5
-    GRID_COLS = 5
+    GRID_LENGTH = 808
+    GRID_WIDTH = 808
+    GRID_ROWS = 101
+    GRID_COLS = 101
     GRID_NODE_LENGTH = GRID_LENGTH / GRID_ROWS
     GRID_NODE_WIDTH = GRID_WIDTH / GRID_COLS
 
@@ -23,7 +23,7 @@ class Visualize:
     RED = (255, 0, 0)
 
     # SLEEP
-    SLEEP_TIME = 1
+    SLEEP_TIME = 0.1
 
     # Grid Display Setup
     gridDisplay = pygame.display.set_mode((GRID_LENGTH, GRID_WIDTH))
@@ -103,7 +103,7 @@ class Visualize:
 
             pygame.display.update()
             time.sleep(self.SLEEP_TIME)
-            if ((i % self.GRID_ROWS == 0) and (i != len(path_followed) - 1)):
+            if ((i % 10 == 0) and (i != len(path_followed) - 1)):
                 self.visualize_grid()
             if i == len(path_followed) - 2:
                 self.visualize_grid()
@@ -123,7 +123,7 @@ class Visualize:
             y += self.GRID_NODE_WIDTH  # for every new row we move one "step" downwards
         pygame.display.update()
 
-    def __init__(self, blocked_cells, path_followed):
+    def __init__(self, blocked_cells, path_followed, source = None, target = None):
 
         for x in blocked_cells:
             self.matrix[x[0], x[1]] = 1
@@ -144,4 +144,4 @@ class Visualize:
 blocked_cells = {(0, 4), (3, 1), (1, 4), (4, 2), (1, 0)}
 path_followed = [[(0, 0), (0, 1), (0, 2), (0, 3), (0, 4), (1, 4), (2, 4), (3, 4), (4, 4)],
                  [(0, 3), (1, 3), (1, 4), (2, 4), (3, 4), (4, 4)], [(1, 3), (2, 3), (2, 4), (3, 4), (4, 4)]]
-S1 = Visualize(blocked_cells , path_followed)
+# S1 = Visualize(blocked_cells , path_followed)
